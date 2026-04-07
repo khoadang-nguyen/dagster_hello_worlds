@@ -1,29 +1,29 @@
 import dagster as dg
-import requests
+from pathlib import Path
+from hello_world.resources.send_ntfy import NftyResource
+
 
 @dg.asset
-def hello() -> None: 
+def hello(nfty: NftyResource) -> None: 
+    
     try: 
         print('hello')
-        requests.post("https://ntfy.sh/dagster_hello_worlds",
-            data="hello success".encode(encoding='utf-8'))
+        nfty.success_message()
     except Exception as e:
-        requests.post("https://ntfy.sh/dagster_hello_worlds",
-            data="hello fail".encode(encoding='utf-8'))
-        raise
-    
+        nfty.failure_message()
+        raise e
+
 
 
 @dg.asset(deps=['hello'])
-def world() -> None:
-    try:      
+def world(nfty: NftyResource) -> None:
+    try: 
         print('world')
-        requests.post("https://ntfy.sh/dagster_hello_worlds",
-            data="world success".encode(encoding='utf-8'))
+        nfty.success_message()
     except Exception as e:
-        requests.post("https://ntfy.sh/dagster_hello_worlds",
-            data="world fail".encode(encoding='utf-8'))
-        raise
+        nfty.failure_message()
+        raise e
+
 
 
 
